@@ -20,9 +20,8 @@ namespace Alligator.Utility
             typeof(CanvasScaler)
         };*/
 
-        //currently if a child game object is chosen and then only this game object preset is chosen,
-        //the preset is saved in a separate folder by the gameObject's name.
-        //write condition such that the preset is saved in a proper folder structure regardless of option.
+        
+        //make changes to loadAssets if necessary
 
         #region save presets
         [MenuItem("GameObject/Custom Utilities/Save Presets", priority = -100)]
@@ -86,7 +85,7 @@ namespace Alligator.Utility
             }
             else
             {
-                //some code
+                currentDirectory = UtilityMethods.GetHierarchyPath(gameObject.transform, parentDirectory);
             }
 
             if (!Directory.Exists(currentDirectory))
@@ -227,5 +226,6 @@ namespace Alligator.Utility
         }
         #endregion
     }
+
 }
 

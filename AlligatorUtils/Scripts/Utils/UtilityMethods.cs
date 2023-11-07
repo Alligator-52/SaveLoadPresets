@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
+
 
 namespace Alligator.Utility
 {
-    public static class DirectChildren
+    public static class UtilityMethods
     {
         public static List<T> GetComponentsInDirectChildren<T>(this GameObject gameObject) where T : Component
         {
@@ -19,6 +19,20 @@ namespace Alligator.Utility
 
             return components;
         }
+
+        public static string GetHierarchyPath(Transform currentTransform, string parentDirectory)
+        {
+            string hierarchyPath = currentTransform.name;
+
+            while (currentTransform.parent != null)
+            {
+                currentTransform = currentTransform.parent;
+                hierarchyPath = currentTransform.name + "/" + hierarchyPath;
+            }
+
+            hierarchyPath = parentDirectory + hierarchyPath + "/";
+
+            return hierarchyPath;
+        }
     }
 }
-
