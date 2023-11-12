@@ -3,13 +3,36 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 using UnityEngine.UIElements;
-using Unity.VisualScripting;
 using UnityEditor.UIElements;
 using Alligator.Utility;
+using System.IO;
 
 public class PresetManager : EditorWindow
 {
     private static string parentDirectory = "Assets/Saved Presets/";
+
+    //implement the component exclusion such that 
+    // option 1 - if the exclude components is selected, then predefined components will be excluded, no need to additionally select which components to exclude
+    // option 2 - if the exclude components is selected, user can choose which components to choose by selecting from the drop down field
+    // and the selected components will show up in a list below and items from the list can be removed and cleared. And the list will also
+    // be cleared after the presets are saved and all the values of the editor window will reset
+    // option 3 (ideal) - add a component search box and selected components can be added to the list below and to a global list.
+    // option 4 - user can select from a multi select drop down.
+
+    private static List<string> componentList = new List<string>
+    {
+        "Transform",
+        "MeshFilter",
+        "MeshRenderer",
+        "GraphicRaycaster",
+        "CanvasScaler"
+    };
+
+
+    public static List<string> GetComponentsList()
+    {
+        return componentList;
+    }
 
     [MenuItem("Alligator/Utils/Preset Manager %g")]
     public static void PresetManagerWindow()
@@ -34,9 +57,11 @@ public class PresetManager : EditorWindow
             }
         };
 
+
         Button saveSinglePresetButton = new Button()
         {
             text = "Save Preset",
+            tooltip = "Creates Commponent Presets for only the selected GameObject",
             style =
             {
                 width = 180,
@@ -59,6 +84,7 @@ public class PresetManager : EditorWindow
         Button saveMultiPresetsButton = new Button()
         {
             text = "Save with Child Presets",
+            tooltip = "Creates Commponent Presets of the selected GameObject and also for it's children",
             style =
             {
                 width = 180,
@@ -81,6 +107,7 @@ public class PresetManager : EditorWindow
         Button assignPresetsButton = new Button()
         {
             text = "Assign Preset(s)",
+            tooltip = "Assigns the created presets to the selected GameObject and it's children",
             style =
             {
                 width = 370,
@@ -92,6 +119,11 @@ public class PresetManager : EditorWindow
         {
             Object[] selectedObjects = Selection.objects;
             string parentDirectory = "Assets/Saved Presets/";
+            if(!Directory.Exists(parentDirectory))
+            {
+                EditorUtility.DisplayDialog("No Presets Found!", "No Presets were found for the selected GameObject", "OK");
+                return;
+            }
 
             foreach (var selectedObject in selectedObjects)
             {
@@ -105,7 +137,51 @@ public class PresetManager : EditorWindow
             }
         };
 
-        ListView selectedObjectsList = new ListView();
+        #region unimplemented section, exclude components
+
+        /*Toggle excludeComponentsToggle = new Toggle("Exclude Components?")
+        {
+            style =
+            {
+                marginTop = 10,
+            }
+        };*/
+
+        /*PopupField<string> excludedComponents = new PopupField<string>(GetComponentsList(), componentList[0])
+        {
+            style =
+            {
+                width = 180,
+            }
+        };
+        excludedComponents.visible = false;*/
+
+        /*DropdownField excludedComponents = new DropdownField(GetComponentsList(), componentList[0])
+        {
+            style =
+            {
+                width = 180,
+            }
+        };
+        excludedComponents.visible = false;*/
+
+
+        /*excludeComponentsToggle.RegisterValueChangedCallback(evt =>
+        {
+            excludedComponents.visible = evt.newValue;
+        });
+
+        VisualElement excludeComponentsContainer = new VisualElement()
+        {
+            style =
+            {
+                flexDirection = FlexDirection.Row,
+                marginTop = 10,
+                justifyContent = Justify.Center
+            }
+        };*/
+
+        #endregion
 
         VisualElement saveButtonsContainer = new VisualElement()
         {
@@ -117,7 +193,7 @@ public class PresetManager : EditorWindow
             }
         };
 
-        VisualElement listContainer = new VisualElement()
+        VisualElement assignButtonContainer = new VisualElement()
         {
             style =
             {
@@ -129,12 +205,14 @@ public class PresetManager : EditorWindow
 
         saveButtonsContainer.Add(saveSinglePresetButton);
         saveButtonsContainer.Add(saveMultiPresetsButton);
-        listContainer.Add(assignPresetsButton);
-        listContainer.Add(selectedObjectsList);
+        assignButtonContainer.Add(assignPresetsButton);
+        //excludeComponentsContainer.Add(excludeComponentsToggle);
+        //excludeComponentsContainer.Add(excludedComponents);
 
         root.Add(header);
         root.Add(saveButtonsContainer);
-        root.Add(listContainer);
+        root.Add(assignButtonContainer);
+        //root.Add(excludeComponentsContainer);
 
     }
 }
