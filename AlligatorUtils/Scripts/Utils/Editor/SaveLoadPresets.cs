@@ -5,6 +5,7 @@ using UnityEditor.Presets;
 using System.IO;
 using System;
 using System.Threading.Tasks;
+using System.Reflection;
 
 
 namespace Alligator.Utility
@@ -20,11 +21,10 @@ namespace Alligator.Utility
             typeof(CanvasScaler)
         };*/
 
-        
-        //make changes to loadAssets if necessary
-
         #region save presets
-        [MenuItem("GameObject/Custom Utilities/Save Presets", priority = -100)]
+
+        #region Menu item for the heirarchy
+        /*[MenuItem("GameObject/Custom Utilities/Save Presets", priority = -100)]
         public static async void SavePresets()
         {
             var selectedObject = Selection.activeObject;
@@ -72,7 +72,21 @@ namespace Alligator.Utility
             AssetDatabase.Refresh();
         }
 
-        private static void SaveSinglePreset(GameObject gameObject, string parentDirectory)
+
+        [MenuItem("GameObject/Custom Utilities/Load Presets", priority = -100)]
+        public static void AssignPresets()
+        {
+            GameObject[] selectedObjects = Selection.gameObjects;
+            string parentDirectory = "Assets/Saved Presets/";
+
+            foreach (var selectedObject in selectedObjects)
+            {
+                AssignPresetsDFS(parentDirectory, selectedObject);
+            }
+        }*/
+
+        #endregion
+        public static void SaveSinglePreset(GameObject gameObject, string parentDirectory)
         {
             Component[] components = null;
             components = gameObject.GetComponents(typeof(Component));
@@ -108,7 +122,7 @@ namespace Alligator.Utility
                 Debug.Log("components array was empty!");
             }
         }
-        private static async Task SavePresetsDFS(string parentFolder, GameObject parentObject)
+        public static async Task SavePresetsDFS(string parentFolder, GameObject parentObject)
         {
             if (parentObject == null)
                 return;
@@ -155,19 +169,7 @@ namespace Alligator.Utility
         #endregion
 
         #region assign presets
-        [MenuItem("GameObject/Custom Utilities/Load Presets", priority = -100)]
-        public static void AssignPresets()
-        {
-            GameObject[] selectedObjects = Selection.gameObjects;
-            string parentDirectory = "Assets/Saved Presets/";
-
-            foreach (var selectedObject in selectedObjects)
-            {
-                AssignPresetsDFS(parentDirectory, selectedObject);
-            }
-        }
-
-        private static void AssignPresetsDFS(string parentDirectory, GameObject parentObject)
+        public static void AssignPresetsDFS(string parentDirectory, GameObject parentObject)
         {
             var subDirectories = Directory.GetDirectories(parentDirectory, parentObject.name, SearchOption.AllDirectories);
             var currentDirectory = $"{subDirectories[0].Replace("\\", "/")}/";
@@ -183,13 +185,14 @@ namespace Alligator.Utility
 
             foreach (var presetFile in presetFiles)
             {
-                string componentName = Path.GetFileNameWithoutExtension(presetFile);
+                string componentNameWithoutExtension = Path.GetFileNameWithoutExtension(presetFile);
+                string componentName = componentNameWithoutExtension.Substring(0,componentNameWithoutExtension.LastIndexOf("_")); //incase a custom component has underscore in the name
 
                 Component component = parentObject.GetComponent(componentName);
 
                 if (component == null)
                 {
-                    var myComponent = $"{componentName}, Assembly-CSharp";
+                    var myComponent = $"{componentName}, {Assembly.GetExecutingAssembly().GetName().Name}";
                     Type componentType = Type.GetType(myComponent);
                     Debug.Log($"Component type of {componentName} is {componentType}");
                     if (componentType != null)
