@@ -2,21 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using Unity.VisualScripting;
 
 public class RuntimeSave : Editor
 {
-    private static RuntimeSave _runtimeSave;
+    //private static RuntimeSave _runtimeSave;
     private static GameObject _saveObject;
 
     [MenuItem("GameObject/Custom Utilities/Save Game Object")]
     public static void SaveGameObject()
     {
-        GameObject activeObject = _runtimeSave.GetActiveGameObject();
-        if (activeObject == null)
+        //_runtimeSave = This
+        var activeSelection = Selection.activeObject;
+        if (activeSelection.GetType() != typeof(GameObject))
             return;
+
+        GameObject currentObject = (GameObject)activeSelection;
+        
         if (EditorApplication.isPlaying)
         {
-            _saveObject = activeObject;
+            Debug.Log("We are here now");
+            _saveObject = currentObject;
+            Debug.Log($"save object : {_saveObject}");
         }
 
     }
@@ -24,7 +31,8 @@ public class RuntimeSave : Editor
     [MenuItem("GameObject/Custom Utilities/Load Game Object")]
     public static void LoadGameObject()
     {
-        if(_saveObject == null)
+        Debug.Log($"save object : {_saveObject}");
+        if (_saveObject == null)
         {
             Debug.Log("Nothing found bruh");
             return;
@@ -36,12 +44,6 @@ public class RuntimeSave : Editor
             _saveObject = null;
         }
 
-    }
-
-
-    private void OnEnable()
-    {
-        _runtimeSave = this;
     }
 
     public GameObject GetActiveGameObject()
