@@ -9,66 +9,41 @@ using System.Drawing;
 
 public class RuntimeSave : Editor
 {
-    //private static RuntimeSave _runtimeSave;
     private static GameObject _saveObject;
-    //private static string _savePath = Application.dataPath + "/TempObjects";
     private static string _savePath = "Assets/TempObjects";
 
     [MenuItem("GameObject/Custom Utilities/Save Game Object")]
     public static void SaveGameObject()
     {
-        //_runtimeSave = This
         var activeSelection = Selection.activeObject;
         if (activeSelection.GetType() != typeof(GameObject))
             return;
 
         GameObject currentObject = (GameObject)activeSelection;
-        
-        if (!EditorApplication.isPlaying)
+
+        _saveObject = currentObject;
+        if (!AssetDatabase.IsValidFolder(_savePath))
         {
-            Debug.Log("We are here now");
+            AssetDatabase.CreateFolder("Assets", $"TempObjects");
 
-            //await CreateDirectory();
-            _saveObject = currentObject;
-            Debug.Log($"is valid? : {AssetDatabase.IsValidFolder(_savePath)}");
-            if (!AssetDatabase.IsValidFolder(_savePath))
-            {
-                Debug.Log($"{_savePath} is not valid");
-                AssetDatabase.CreateFolder("Assets", $"TempObjects");
-                
-            }
-            PrefabUtility.SaveAsPrefabAsset(_saveObject, _savePath + $"/{currentObject.name}.prefab"); //+ currentObject.name + ".prefab");
-            //AssetDatabase.CreateAsset(_saveObject, Application.dataPath + _saveObject.name + ".prefab");
-            //Debug.Log($"save object : {_saveObject}");
         }
+        PrefabUtility.SaveAsPrefabAsset(_saveObject, _savePath + $"/{currentObject.name}.prefab");
 
-    }
-
-    private static async Task CreateDirectory()
-    {
-        Debug.Log("Creating Directory");
-        if (!Directory.Exists(_savePath))
-        {
-            Directory.CreateDirectory(_savePath);
-        }
-        await Task.Yield();
     }
 
     [MenuItem("GameObject/Custom Utilities/Load Game Object")]
     public static void LoadGameObject()
     {
-        Debug.Log($"save object : {_saveObject}");
-        if (_saveObject == null)
-        {
-            Debug.Log("Nothing found bruh");
-            return;
-        }
-        
-        if (!EditorApplication.isPlaying)
-        {
-            Instantiate(_saveObject);
-            _saveObject = null;
-        }
+        Debug.Log("We are here now");
+        //var savedObjects = AssetDatabase.LoadAllAssetsAtPath(_savePath);
+        var savedObjects = AssetDatabase.LoadAssetAtPath<Object>("Assets/TempObjects/Cube.prefab");
+        Debug.Log("now We are here");
+        //Debug.Log(savedObjects);
+        _saveObject = (GameObject)savedObjects;
+        var newObject = Instantiate(_saveObject);
+        newObject.name = _saveObject.name;
+
+
 
     }
 }
