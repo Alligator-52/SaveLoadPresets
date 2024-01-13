@@ -34,16 +34,13 @@ public class RuntimeSave : Editor
     [MenuItem("GameObject/Custom Utilities/Load Game Object", priority = -100000)]
     public static void LoadGameObject()
     {
-        Debug.Log("We are here now");
-        //var savedObjects = AssetDatabase.LoadAllAssetsAtPath(_savePath);
-        var savedObjects = AssetDatabase.LoadAssetAtPath<Object>("Assets/TempObjects/Cube.prefab");
-        Debug.Log("now We are here");
-        //Debug.Log(savedObjects);
-        _saveObject = (GameObject)savedObjects;
-        var newObject = Instantiate(_saveObject);
-        newObject.name = _saveObject.name;
-
-
-
+        var prefabFiles = Directory.GetFiles(_savePath, "*.prefab");
+        for(int i = 0; i < prefabFiles.Length; i++)
+        {
+            var savedObject = AssetDatabase.LoadAssetAtPath<Object>(prefabFiles[i].Replace("\\","/"));
+            _saveObject = (GameObject)savedObject;
+            var newObject = Instantiate(_saveObject);
+            newObject.name = _saveObject.name;
+        }
     }
 }
