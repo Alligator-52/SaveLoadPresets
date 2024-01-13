@@ -12,26 +12,29 @@ public class RuntimeSave : Editor
     private static GameObject _saveObject;
     private static string _savePath = "Assets/TempObjects";
 
-    [MenuItem("GameObject/Custom Utilities/Save Game Object", priority = -100000)]
+    [MenuItem("GameObject/Custom Utilities/Save GameObjects", priority = -100000)]
     public static void SaveGameObject()
     {
-        var activeSelection = Selection.activeObject;
-        if (activeSelection.GetType() != typeof(GameObject))
-            return;
-
-        GameObject currentObject = (GameObject)activeSelection;
-
-        _saveObject = currentObject;
-        if (!AssetDatabase.IsValidFolder(_savePath))
+        var activeSelections = Selection.objects;
+        for(int i = 0; i < activeSelections.Length; i++)
         {
-            AssetDatabase.CreateFolder("Assets", $"TempObjects");
+            if (activeSelections[i].GetType() != typeof(GameObject))
+            {
+                Debug.Log($"{activeSelections[i]} is an invalid type, couldnt save!");
+                continue;
+            }
+            GameObject currentObject = (GameObject)activeSelections[i];
+            _saveObject = currentObject;
+            if (!AssetDatabase.IsValidFolder(_savePath))
+            {
+                AssetDatabase.CreateFolder("Assets", $"TempObjects");
 
+            }
+            PrefabUtility.SaveAsPrefabAsset(_saveObject, _savePath + $"/{currentObject.name}.prefab");
         }
-        PrefabUtility.SaveAsPrefabAsset(_saveObject, _savePath + $"/{currentObject.name}.prefab");
-
     }
 
-    [MenuItem("GameObject/Custom Utilities/Load Game Object", priority = -100000)]
+    [MenuItem("GameObject/Custom Utilities/Load GameObjects", priority = -100000)]
     public static void LoadGameObject()
     {
         var prefabFiles = Directory.GetFiles(_savePath, "*.prefab");
@@ -41,6 +44,7 @@ public class RuntimeSave : Editor
             _saveObject = (GameObject)savedObject;
             var newObject = Instantiate(_saveObject);
             newObject.name = _saveObject.name;
+
         }
     }
 }
