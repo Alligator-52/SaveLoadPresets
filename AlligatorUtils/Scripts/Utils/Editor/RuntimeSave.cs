@@ -12,7 +12,7 @@ public class RuntimeSave : Editor
     private static GameObject _saveObject;
     private static string _savePath = "Assets/TempObjects";
 
-    [MenuItem("GameObject/Custom Utilities/Save Game Object")]
+    [MenuItem("GameObject/Custom Utilities/Save Game Object", priority = -100000)]
     public static void SaveGameObject()
     {
         var activeSelection = Selection.activeObject;
@@ -31,7 +31,7 @@ public class RuntimeSave : Editor
 
     }
 
-    [MenuItem("GameObject/Custom Utilities/Load Game Object")]
+    [MenuItem("GameObject/Custom Utilities/Load Game Object", priority = -100000)]
     public static void LoadGameObject()
     {
         Debug.Log("We are here now");
