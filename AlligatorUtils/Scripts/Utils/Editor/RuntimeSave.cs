@@ -5,12 +5,14 @@ using UnityEditor;
 using Unity.VisualScripting;
 using System.IO;
 using System.Threading.Tasks;
+using System.Drawing;
 
 public class RuntimeSave : Editor
 {
     //private static RuntimeSave _runtimeSave;
     private static GameObject _saveObject;
-    private static string _savePath = Application.dataPath + "/TempObjects/";
+    //private static string _savePath = Application.dataPath + "/TempObjects";
+    private static string _savePath = "Assets/TempObjects";
 
     [MenuItem("GameObject/Custom Utilities/Save Game Object")]
     public static void SaveGameObject()
@@ -28,11 +30,14 @@ public class RuntimeSave : Editor
 
             //await CreateDirectory();
             _saveObject = currentObject;
-            if (AssetDatabase.IsValidFolder(_savePath))
+            Debug.Log($"is valid? : {AssetDatabase.IsValidFolder(_savePath)}");
+            if (!AssetDatabase.IsValidFolder(_savePath))
             {
-                AssetDatabase.CreateFolder("Assets", "TempObjects");
+                Debug.Log($"{_savePath} is not valid");
+                AssetDatabase.CreateFolder("Assets", $"TempObjects");
+                
             }
-            PrefabUtility.SaveAsPrefabAsset(_saveObject, _savePath); //+ currentObject.name + ".prefab");
+            PrefabUtility.SaveAsPrefabAsset(_saveObject, _savePath + $"/{currentObject.name}.prefab"); //+ currentObject.name + ".prefab");
             //AssetDatabase.CreateAsset(_saveObject, Application.dataPath + _saveObject.name + ".prefab");
             //Debug.Log($"save object : {_saveObject}");
         }
