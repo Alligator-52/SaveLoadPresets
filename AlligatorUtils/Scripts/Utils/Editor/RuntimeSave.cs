@@ -6,6 +6,7 @@ using Unity.VisualScripting;
 using System.IO;
 using System.Threading.Tasks;
 using System.Drawing;
+using System.Linq;
 
 public class RuntimeSave : Editor
 {
@@ -15,8 +16,8 @@ public class RuntimeSave : Editor
     [MenuItem("GameObject/Custom Utilities/Save GameObjects", priority = -100000)]
     public static void SaveGameObject()
     {
-        var activeSelections = Selection.objects;
-        for(int i = 0; i < activeSelections.Length; i++)
+        Object[] activeSelections = Selection.objects;
+        for (int i = 0; i < activeSelections.Length; i++)
         {
             if (activeSelections[i].GetType() != typeof(GameObject))
             {
@@ -38,13 +39,15 @@ public class RuntimeSave : Editor
     public static void LoadGameObject()
     {
         var prefabFiles = Directory.GetFiles(_savePath, "*.prefab");
-        for(int i = 0; i < prefabFiles.Length; i++)
+        for (int i = 0; i < prefabFiles.Length; i++)
         {
-            var savedObject = AssetDatabase.LoadAssetAtPath<Object>(prefabFiles[i].Replace("\\","/"));
+            Object savedObject = AssetDatabase.LoadAssetAtPath<Object>(prefabFiles[i].Replace("\\", "/"));
             _saveObject = (GameObject)savedObject;
-            var newObject = Instantiate(_saveObject);
+            GameObject newObject = Instantiate(_saveObject);
             newObject.name = _saveObject.name;
-
         }
+
+        List<string> outFailedPaths = new List<string>();
+        AssetDatabase.DeleteAssets(prefabFiles, outFailedPaths);
     }
 }
